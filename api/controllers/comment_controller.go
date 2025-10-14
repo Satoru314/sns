@@ -17,7 +17,15 @@ func NewCommentController(s services.CommentServicer) *CommentController {
 	return &CommentController{service: s}
 }
 
-// POST /comment のハンドラ
+// PostCommentHandler godoc
+// @Summary Create a new comment
+// @Description Post a comment on an article
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param comment body models.Comment true "Comment object"
+// @Success 200 {object} models.Comment
+// @Router /comment [post]
 func (c *CommentController) PostCommentHandler(w http.ResponseWriter, req *http.Request) {
 	var reqComment models.Comment
 	if err := json.NewDecoder(req.Body).Decode(&reqComment); err != nil {

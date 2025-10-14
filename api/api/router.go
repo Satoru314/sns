@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/gorilla/mux"
+	_ "github.com/yourname/reponame/docs"
 	"github.com/yourname/reponame/api/middlewares"
 	"github.com/yourname/reponame/controllers"
 	"github.com/yourname/reponame/services"
@@ -25,6 +27,9 @@ func NewRouter(db *sql.DB) *mux.Router {
 	r.HandleFunc("/article/nice", aCon.PostNiceHandler).Methods(http.MethodPost)
 
 	r.HandleFunc("/comment", cCon.PostCommentHandler).Methods(http.MethodPost)
+
+	// Swagger endpoint
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	r.Use(middlewares.LoggingMiddleware)
 	r.Use(middlewares.AuthMiddleware)

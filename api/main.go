@@ -12,6 +12,12 @@ import (
 	"github.com/yourname/reponame/api"
 )
 
+// @title SNS API
+// @version 1.0
+// @description This is a simple SNS API server
+// @host localhost:8080
+// @BasePath /
+
 func main() {
 	// .envファイルを読み込む
 	err := godotenv.Load()

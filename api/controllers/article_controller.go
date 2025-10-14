@@ -22,12 +22,27 @@ func NewArticleController(s services.ArticleServicer) *ArticleController {
 	return &ArticleController{service: s}
 }
 
-// GET /hello のハンドラ
+// HelloHandler godoc
+// @Summary Hello World
+// @Description Returns hello world message
+// @Tags hello
+// @Accept json
+// @Produce plain
+// @Success 200 {string} string "Hello, world!"
+// @Router /hello [get]
 func (c *ArticleController) HelloHandler(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Hello, world!\n")
 }
 
-// POST /article のハンドラ
+// PostArticleHandler godoc
+// @Summary Create a new article
+// @Description Post a new article
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param article body models.Article true "Article object"
+// @Success 200 {object} models.Article
+// @Router /article [post]
 func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
@@ -52,7 +67,15 @@ func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.
 	json.NewEncoder(w).Encode(article)
 }
 
-// GET /article/list のハンドラ
+// ArticleListHandler godoc
+// @Summary Get article list
+// @Description Get paginated article list
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Success 200 {array} models.Article
+// @Router /article/list [get]
 func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
 
@@ -79,7 +102,15 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 	json.NewEncoder(w).Encode(articleList)
 }
 
-// GET /article/{id} のハンドラ
+// ArticleDetailHandler godoc
+// @Summary Get article by ID
+// @Description Get a single article with its comments
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param id path int true "Article ID"
+// @Success 200 {object} models.Article
+// @Router /article/{id} [get]
 func (c *ArticleController) ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
@@ -97,7 +128,15 @@ func (c *ArticleController) ArticleDetailHandler(w http.ResponseWriter, req *htt
 	json.NewEncoder(w).Encode(article)
 }
 
-// POST /article/nice のハンドラ
+// PostNiceHandler godoc
+// @Summary Add a nice (like) to article
+// @Description Increment the nice counter for an article
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param article body models.Article true "Article object with ID"
+// @Success 200 {object} models.Article
+// @Router /article/nice [post]
 func (c *ArticleController) PostNiceHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {

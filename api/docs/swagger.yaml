@@ -1,0 +1,166 @@
+
+basePath: /
+definitions:
+  models.Article:
+    properties:
+      article_id:
+        type: integer
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      contents:
+        type: string
+      created_at:
+        type: string
+      nice:
+        type: integer
+      title:
+        type: string
+      user_name:
+        type: string
+    type: object
+  models.Comment:
+    properties:
+      article_id:
+        type: integer
+      comment_id:
+        type: integer
+      created_at:
+        type: string
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a simple SNS API server
+  title: SNS API
+  version: "1.0"
+paths:
+  /article:
+    post:
+      consumes:
+      - application/json
+      description: Post a new article
+      parameters:
+      - description: Article object
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+      summary: Create a new article
+      tags:
+      - articles
+  /article/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single article with its comments
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+      summary: Get article by ID
+      tags:
+      - articles
+  /article/list:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated article list
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Article'
+            type: array
+      summary: Get article list
+      tags:
+      - articles
+  /article/nice:
+    post:
+      consumes:
+      - application/json
+      description: Increment the nice counter for an article
+      parameters:
+      - description: Article object with ID
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+      summary: Add a nice (like) to article
+      tags:
+      - articles
+  /comment:
+    post:
+      consumes:
+      - application/json
+      description: Post a comment on an article
+      parameters:
+      - description: Comment object
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Create a new comment
+      tags:
+      - comments
+  /hello:
+    get:
+      consumes:
+      - application/json
+      description: Returns hello world message
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Hello, world!
+          schema:
+            type: string
+      summary: Hello World
+      tags:
+      - hello
+swagger: "2.0"
