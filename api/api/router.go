@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"net/http"
 
-	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/gorilla/mux"
-	_ "github.com/yourname/reponame/docs"
-	"github.com/yourname/reponame/api/middlewares"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/yourname/reponame/controllers"
+	_ "github.com/yourname/reponame/docs"
 	"github.com/yourname/reponame/services"
 )
 
@@ -31,8 +30,8 @@ func NewRouter(db *sql.DB) *mux.Router {
 	// Swagger endpoint
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	r.Use(middlewares.LoggingMiddleware)
-	r.Use(middlewares.AuthMiddleware)
+	// r.Use(middlewares.LoggingMiddleware)
+	// r.Use(middlewares.AuthMiddleware)
 
 	return r
 }
