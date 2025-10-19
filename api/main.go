@@ -36,6 +36,12 @@ func main() {
 		return
 	}
 
+	// 起動時の接続チェック
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
+	log.Println("Database connection established successfully")
+
 	r := api.NewRouter(db)
 
 	log.Println("server start at port 8080")
