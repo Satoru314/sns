@@ -1,28 +1,7 @@
-import { getArticles } from '../api/articles/articles'
-import { useState, useEffect } from 'react'
+import { useArticles } from '../hooks/useArticles'
 
 export default function ArticleListPage() {
-  const [articles, setArticles] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        setIsLoading(true)
-        const api = getArticles()
-        const response = await api.getArticleList()
-        setArticles(response.data)
-      } catch (err) {
-        setError(err)
-        console.error('記事の取得に失敗しました:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchArticles()
-  }, [])
+  const { data: articles = [], isLoading, error } = useArticles()
 
   if (isLoading) {
     return (

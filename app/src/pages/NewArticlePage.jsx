@@ -1,15 +1,15 @@
 import { useNavigate } from '@tanstack/react-router'
-import { getArticles } from '../api/articles/articles'
+import { useCreateArticle } from '../hooks/useCreateArticle'
 import { useState } from 'react'
 
 export default function NewArticlePage() {
   const navigate = useNavigate()
+  const { mutate: createArticle, isPending } = useCreateArticle()
   const [formData, setFormData] = useState({
     title: '',
     contents: '',
     user_name: '',
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
   const handleChange = (e) => {
@@ -37,25 +37,26 @@ export default function NewArticlePage() {
       return
     }
 
-    try {
-      setIsSubmitting(true)
-      setError(null)
+    setError(null)
 
-      const api = getArticles()
-      await api.postArticle({
+    // TanStack Queryのmutateを使用
+    createArticle(
+      {
         title: formData.title.trim(),
         contents: formData.contents.trim(),
         user_name: formData.user_name.trim(),
-      })
-
-      // 投稿成功後、記事一覧ページにリダイレクト
-      navigate({ to: '/' })
-    } catch (err) {
-      console.error('記事の投稿に失敗しました:', err)
-      setError('記事の投稿に失敗しました。もう一度お試しください。')
-    } finally {
-      setIsSubmitting(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          // 投稿成功後、記事一覧ページにリダイレクト
+          navigate({ to: '/' })
+        },
+        onError: (err) => {
+          console.error('記事の投稿に失敗しました:', err)
+          setError('記事の投稿に失敗しました。もう一度お試しください。')
+        },
+      }
+    )
   }
 
   return (
@@ -83,7 +84,7 @@ export default function NewArticlePage() {
                 name="user_name"
                 value={formData.user_name}
                 onChange={handleChange}
-                disabled={isSubmitting}
+                disabled={isPending}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 placeholder="山田太郎"
               />
@@ -100,7 +101,7 @@ export default function NewArticlePage() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                disabled={isSubmitting}
+                disabled={isPending}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 placeholder="記事のタイトルを入力"
               />
@@ -117,7 +118,7 @@ export default function NewArticlePage() {
                 rows="10"
                 value={formData.contents}
                 onChange={handleChange}
-                disabled={isSubmitting}
+                disabled={isPending}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 placeholder="記事の本文を入力"
               />
@@ -127,16 +128,16 @@ export default function NewArticlePage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isPending}
                 className="flex-1 bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
               >
-                {isSubmitting ? '投稿中...' : '投稿する'}
+                {isPending ? '投稿中...' : '投稿する'}
               </button>
 
               <button
                 type="button"
                 onClick={() => navigate({ to: '/' })}
-                disabled={isSubmitting}
+                disabled={isPending}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 キャンセル
