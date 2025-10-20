@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { getArticles } from '../api/articles/articles'
+import type { ModelsArticle } from '../types/api'
 
 /**
  * 記事一覧を取得するカスタムフック
- * @param {number} page - ページ番号（デフォルト: 1）
- * @returns {Object} { data: articles, isLoading, error }
  */
-export function useArticles(page = 1) {
-  return useQuery({
+export function useArticles(page: number = 1) {
+  return useQuery<ModelsArticle[]>({
     queryKey: ['articles', page],
     queryFn: async () => {
       const api = getArticles()

@@ -1,14 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { getArticles } from '../api/articles/articles'
+import type { ModelsArticle } from '../types/api'
+
+type CreateArticleInput = {
+  title: string
+  contents: string
+  user_name: string
+}
 
 /**
  * 記事を投稿するカスタムフック
- * @returns {Object} { mutate, mutateAsync, isLoading, error }
  */
 export function useCreateArticle() {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  return useMutation<ModelsArticle, Error, CreateArticleInput>({
     mutationFn: async (articleData) => {
       const api = getArticles()
       const response = await api.postArticle(articleData)
