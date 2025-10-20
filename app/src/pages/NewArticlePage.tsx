@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useCreateArticle } from '../hooks/useCreateArticle'
-import { useState } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 
 export default function NewArticlePage() {
   const navigate = useNavigate()
@@ -10,9 +10,9 @@ export default function NewArticlePage() {
     contents: '',
     user_name: '',
   })
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -20,7 +20,7 @@ export default function NewArticlePage() {
     }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // フォームバリデーション
@@ -115,7 +115,7 @@ export default function NewArticlePage() {
               <textarea
                 id="contents"
                 name="contents"
-                rows="10"
+                rows={10}
                 value={formData.contents}
                 onChange={handleChange}
                 disabled={isPending}
