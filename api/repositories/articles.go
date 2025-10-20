@@ -37,7 +37,9 @@ func SelectArticleList(db *sql.DB, page int) ([]models.Article, error) {
 	const sqlStr = `
 		select article_id, title, contents, username, nice
 		from articles
-		limit ? offset ?;
+		order by article_id desc
+		limit ? offset ?
+		;
 	`
 
 	rows, err := db.Query(sqlStr, articleNumPerPage, ((page - 1) * articleNumPerPage))

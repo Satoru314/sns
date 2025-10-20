@@ -2,14 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/apperrors"
-	"github.com/yourname/reponame/common"
 	"github.com/yourname/reponame/controllers/services"
 	"github.com/yourname/reponame/models"
 )
@@ -51,12 +49,13 @@ func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.
 		return
 	}
 
-	authedUserName := common.GetUserName(req.Context())
-	if reqArticle.UserName != authedUserName {
-		err := apperrors.NotMatchUser.Wrap(errors.New("does not match reqBody user and idtoken user"), "invalid parameter")
-		apperrors.ErrorHandler(w, req, err)
-		return
-	}
+	// TODO: 認証機能を実装する際に有効化する
+	// authedUserName := common.GetUserName(req.Context())
+	// if reqArticle.UserName != authedUserName {
+	// 	err := apperrors.NotMatchUser.Wrap(errors.New("does not match reqBody user and idtoken user"), "invalid parameter")
+	// 	apperrors.ErrorHandler(w, req, err)
+	// 	return
+	// }
 
 	article, err := c.service.PostArticleService(reqArticle)
 	if err != nil {
