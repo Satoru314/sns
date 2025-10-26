@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from './controllersLoginRequest';
+export * from './controllersLoginResponse';
 export * from './getArticleListParams';
 export * from './modelsArticle';
 export * from './modelsComment';

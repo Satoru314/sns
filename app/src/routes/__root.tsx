@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute, Link, useNavigate } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { useState, useEffect } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -8,17 +8,10 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState<string | null>(null)
-
-  // ログイン状態を確認
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('username')
-    setUsername(storedUsername)
-  }, [])
+  const { user, logout: authLogout, isAuthenticated } = useAuth()
 
   const handleLogout = () => {
-    localStorage.removeItem('username')
-    setUsername(null)
+    authLogout()
     navigate({ to: '/' })
   }
 
@@ -44,10 +37,17 @@ function RootComponent() {
 
             {/* ログイン状態表示 */}
             <div className="flex items-center space-x-4">
-              {username ? (
+              {isAuthenticated && user ? (
                 <>
+                  {user.picture && (
+                    <img
+                      src={user.picture}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
                   <span className="text-sm text-gray-700">
-                    ようこそ、{username}さん
+                    {user.name}
                   </span>
                   <button
                     onClick={handleLogout}

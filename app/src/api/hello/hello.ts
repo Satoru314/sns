@@ -5,7 +5,7 @@
  * This is a simple SNS API server
  * OpenAPI spec version: 1.0
  */
-import axios from 'axios';
+import * as axios from 'axios';
 import type {
   AxiosRequestConfig,
   AxiosResponse
@@ -22,7 +22,7 @@ import type {
 const getHello = <TData = AxiosResponse<string>>(
      options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.get(
+    return axios.default.get(
       `/hello`,{
         responseType: 'text',
     ...options,}

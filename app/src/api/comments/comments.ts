@@ -5,7 +5,7 @@
  * This is a simple SNS API server
  * OpenAPI spec version: 1.0
  */
-import axios from 'axios';
+import * as axios from 'axios';
 import type {
   AxiosRequestConfig,
   AxiosResponse
@@ -26,7 +26,7 @@ import type {
 const postComment = <TData = AxiosResponse<ModelsComment>>(
     modelsComment: ModelsComment, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.post(
+    return axios.default.post(
       `/comment`,
       modelsComment,options
     );

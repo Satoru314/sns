@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, type FormEvent } from 'react'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
+import { useAuth } from '../../contexts/AuthContext'
 
 export const Route = createFileRoute('/_public/login')({
   component: LoginPage,
@@ -7,70 +8,66 @@ export const Route = createFileRoute('/_public/login')({
 
 function LoginPage() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const { login, isLoading, error } = useAuth()
+  const search = useSearch({ from: '/_public/login' })
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+      try {
+        // AuthContextのloginを呼び出してバックエンドで検証
+        await login(credentialResponse.credential)
 
-    if (!username.trim()) {
-      alert('ユーザー名を入力してください')
-      return
+        // リダイレクト先があればそこへ、なければトップページへ
+        const redirectPath = (search as any)?.redirect || '/'
+        navigate({ to: redirectPath })
+      } catch (err) {
+        // エラーはAuthContextで管理されているので何もしない
+        console.error('Login failed:', err)
+      }
     }
+  }
 
-    // TODO: 後でGoogle OAuth統合
-    // 現時点では仮のログイン（LocalStorageに保存）
-    localStorage.setItem('username', username.trim())
-
-    // ログイン後、記事一覧ページへリダイレクト
-    navigate({ to: '/' })
+  const handleGoogleError = () => {
+    console.error('Google login failed')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            ログイン
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            SNSアプリケーション
-          </p>
-        </div>
+        <div className="mt-8 space-y-6">
+          {/* エラー表示 */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm">
-            <div>
-              <label htmlFor="username" className="sr-only">
-                ユーザー名
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="ユーザー名を入力"
+          {/* ローディング中の表示 */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <p className="text-sm text-gray-600">ログイン処理中...</p>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                size="large"
+                text="signin_with"
+                shape="rectangular"
               />
             </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              ログイン
-            </button>
-          </div>
+          )}
 
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              ※ 現在は仮のログインです。後でGoogle OAuthを統合予定
+              Googleアカウントでログインしてください
             </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

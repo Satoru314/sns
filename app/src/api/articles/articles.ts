@@ -5,7 +5,7 @@
  * This is a simple SNS API server
  * OpenAPI spec version: 1.0
  */
-import axios from 'axios';
+import * as axios from 'axios';
 import type {
   AxiosRequestConfig,
   AxiosResponse
@@ -27,7 +27,7 @@ import type {
 const postArticle = <TData = AxiosResponse<ModelsArticle>>(
     modelsArticle: ModelsArticle, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.post(
+    return axios.default.post(
       `/article`,
       modelsArticle,options
     );
@@ -39,7 +39,7 @@ const postArticle = <TData = AxiosResponse<ModelsArticle>>(
 const getArticleId = <TData = AxiosResponse<ModelsArticle>>(
     id: number, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.get(
+    return axios.default.get(
       `/article/${id}`,options
     );
   }
@@ -50,7 +50,7 @@ const getArticleId = <TData = AxiosResponse<ModelsArticle>>(
 const getArticleList = <TData = AxiosResponse<ModelsArticle[]>>(
     params?: GetArticleListParams, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.get(
+    return axios.default.get(
       `/article/list`,{
     ...options,
         params: {...params, ...options?.params},}
@@ -63,7 +63,7 @@ const getArticleList = <TData = AxiosResponse<ModelsArticle[]>>(
 const postArticleNice = <TData = AxiosResponse<ModelsArticle>>(
     modelsArticle: ModelsArticle, options?: AxiosRequestConfig
  ): Promise<TData> => {
-    return axios.post(
+    return axios.default.post(
       `/article/nice`,
       modelsArticle,options
     );

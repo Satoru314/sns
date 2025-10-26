@@ -1,6 +1,19 @@
-
 basePath: /
 definitions:
+  controllers.LoginRequest:
+    properties:
+      idToken:
+        type: string
+    type: object
+  controllers.LoginResponse:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      picture:
+        type: string
+    type: object
   models.Article:
     properties:
       article_id:
@@ -126,6 +139,37 @@ paths:
       summary: Add a nice (like) to article
       tags:
       - articles
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Validate Google ID token and set HttpOnly cookie
+      parameters:
+      - description: Google ID Token
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.LoginResponse'
+      summary: Google OAuth Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Clear authentication cookie
+      responses:
+        "200":
+          description: OK
+      summary: Logout
+      tags:
+      - auth
   /comment:
     post:
       consumes:

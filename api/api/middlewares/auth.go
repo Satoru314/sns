@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/yourname/reponame/apperrors"
@@ -11,39 +12,48 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-const (
-	googleClientID = "[yourClientID]"
-)
+func getGoogleClientID() string {
+	clientID := os.Getenv("GOOGLE_CLIENT_ID")
+	if clientID == "" {
+		return "[yourClientID]" // フォールバック
+	}
+	return clientID
+}
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// ヘッダを抜き出す
-		authorization := req.Header.Get("Authorization")
-
-		// ヘッダの妥当性を検証
-		authHeaders := strings.Split(authorization, " ")
-		if len(authHeaders) != 2 {
-			err := apperrors.RequiredAuthorizationHeader.Wrap(errors.New("invalid req header"), "invalid header")
-			apperrors.ErrorHandler(w, req, err)
+		// /auth/* エンドポイントは認証をスキップ
+		if strings.HasPrefix(req.URL.Path, "/auth/") {
+			next.ServeHTTP(w, req)
 			return
 		}
 
-		bearer, idToken := authHeaders[0], authHeaders[1]
-		if bearer != "Bearer" || idToken == "" {
-			err := apperrors.RequiredAuthorizationHeader.Wrap(errors.New("invalid req header"), "invalid header")
-			apperrors.ErrorHandler(w, req, err)
-			return
+		// まずcookieからトークンを取得
+		var idToken string
+		cookie, err := req.Cookie("google_id_token")
+		if err == nil && cookie.Value != "" {
+			idToken = cookie.Value
+		} else {
+			// cookieがない場合はAuthorizationヘッダーから取得（後方互換性）
+			authorization := req.Header.Get("Authorization")
+			authHeaders := strings.Split(authorization, " ")
+			if len(authHeaders) != 2 {
+				err := apperrors.RequiredAuthorizationHeader.Wrap(errors.New("invalid req header"), "invalid header")
+				apperrors.ErrorHandler(w, req, err)
+				return
+			}
+
+			bearer, token := authHeaders[0], authHeaders[1]
+			if bearer != "Bearer" || token == "" {
+				err := apperrors.RequiredAuthorizationHeader.Wrap(errors.New("invalid req header"), "invalid header")
+				apperrors.ErrorHandler(w, req, err)
+				return
+			}
+			idToken = token
 		}
 
-		// IDトークン検証
-		tokenValidator, err := idtoken.NewValidator(context.Background())
-		if err != nil {
-			err = apperrors.CannotMakeValidator.Wrap(err, "internal auth error")
-			apperrors.ErrorHandler(w, req, err)
-			return
-		}
-
-		payload, err := tokenValidator.Validate(context.Background(), idToken, googleClientID)
+		// IDトークン検証（ADC不要の方法）
+		payload, err := idtoken.Validate(context.Background(), idToken, getGoogleClientID())
 		if err != nil {
 			err = apperrors.Unauthorizated.Wrap(err, "invalid id token")
 			apperrors.ErrorHandler(w, req, err)
