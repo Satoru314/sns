@@ -37,7 +37,7 @@ function RootComponent() {
 
             {/* ログイン状態表示 */}
             <div className="flex items-center space-x-4">
-              {isAuthenticated && user ? (
+              {isAuthenticated && user && (
                 <>
                   {user.picture && (
                     <img
@@ -56,13 +56,6 @@ function RootComponent() {
                     ログアウト
                   </button>
                 </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="text-sm text-gray-500 hover:text-gray-900"
-                >
-                  ログイン
-                </Link>
               )}
             </div>
           </div>
