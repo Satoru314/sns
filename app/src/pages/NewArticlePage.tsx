@@ -1,5 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useCreateArticle, useUser, useArticleForm } from '../hooks'
+import { useCreateArticle } from '../hooks/useCreateArticle'
+import { useUser } from '../hooks/useUser'
+import { useArticleForm } from '../hooks/useArticleForm'
 import { useState, type FormEvent } from 'react'
 
 export default function NewArticlePage() {
@@ -49,11 +51,11 @@ export default function NewArticlePage() {
   }
 
   return (
-    <div className="px-4 sm:px-0">
+    <div className="px-0">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">新規記事投稿</h1>
 
-      <div className="bg-white shadow sm:rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
+      <div className="bg-white shadow">
+        <div className="px-4 py-5">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* エラーメッセージ */}
             {error && (
