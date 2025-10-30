@@ -1,37 +1,13 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useCreateArticle } from '../hooks/useCreateArticle'
-import { useUser } from '../hooks/useUser'
-import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react'
+import { useCreateArticle, useUser, useArticleForm } from '../hooks'
+import { useState, type FormEvent } from 'react'
 
 export default function NewArticlePage() {
   const navigate = useNavigate()
   const { mutate: createArticle, isPending } = useCreateArticle()
   const user = useUser()
-
-  const [formData, setFormData] = useState({
-    title: '',
-    contents: '',
-    user_name: '',
-  })
+  const { formData, handleChange } = useArticleForm(user)
   const [error, setError] = useState<string | null>(null)
-
-  // userが読み込まれたらformDataを更新
-  useEffect(() => {
-    if (user?.name) {
-      setFormData(prev => ({
-        ...prev,
-        user_name: user.name || ''
-      }))
-    }
-  }, [user])
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
