@@ -12,7 +12,7 @@ function RootComponent() {
 
   const handleLogout = () => {
     authLogout()
-    navigate({ to: '/' })
+    navigate({ to: '/login' })
   }
 
   return (

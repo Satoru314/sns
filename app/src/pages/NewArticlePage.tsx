@@ -1,16 +1,29 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useCreateArticle } from '../hooks/useCreateArticle'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useUser } from '../hooks/useUser'
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react'
 
 export default function NewArticlePage() {
   const navigate = useNavigate()
   const { mutate: createArticle, isPending } = useCreateArticle()
+  const user = useUser()
+
   const [formData, setFormData] = useState({
     title: '',
     contents: '',
     user_name: '',
   })
   const [error, setError] = useState<string | null>(null)
+
+  // userが読み込まれたらformDataを更新
+  useEffect(() => {
+    if (user?.name) {
+      setFormData(prev => ({
+        ...prev,
+        user_name: user.name || ''
+      }))
+    }
+  }, [user])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -72,24 +85,6 @@ export default function NewArticlePage() {
                 {error}
               </div>
             )}
-
-            {/* ユーザー名 */}
-            <div>
-              <label htmlFor="user_name" className="block text-sm font-medium text-gray-700 mb-2">
-                ユーザー名 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="user_name"
-                name="user_name"
-                value={formData.user_name}
-                onChange={handleChange}
-                disabled={isPending}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                placeholder="山田太郎"
-              />
-            </div>
-
             {/* タイトル */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
