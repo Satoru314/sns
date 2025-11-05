@@ -1,6 +1,14 @@
 import React, { useState } from "react"
 import { Icon } from "../components/icon"
 import { SideBarUnit } from "../components/sidebarunit"
+import type { SideBarUnitProps } from "../types/sidebar"
+
+const sideBarUnitProps: SideBarUnitProps[] = [
+    { icon: "MdOutlineArticle", link: "/", linkName: "記事一覧" },
+    { icon: "IoIosAddCircleOutline", link: "/articles/new", linkName: "記事作成" },
+    { icon: "AiFillAccountBook", link: "/", linkName: "hello" }
+]
+
 export default function SideBar(): React.ReactNode {
     const [isOpen, setIsOpen] = useState<boolean>(true)
 
@@ -9,8 +17,9 @@ export default function SideBar(): React.ReactNode {
             <button className="bg-center" onClick={() => setIsOpen(!isOpen)} >
                 <Icon name="FiSidebar" size={64} />
             </button>
-            <SideBarUnit isOpen={isOpen} link="http://a4-home-page.vercel.app" icon="AiFillAccountBook" linkName="リンク名" />
-
+            {sideBarUnitProps.map((value, index) => (
+                <SideBarUnit key={index} sideBarUnitProps={value} isOpen={isOpen} />
+            ))}
         </div >
     )
 }
